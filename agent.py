@@ -4,6 +4,10 @@ import time
 JUMP = 0
 PAUSE = 1
 
+ALIVE = 0
+PASSPIPE = 1
+DEAD = 2
+
 class EpsilonGreedy:
     def __init__(self):
         self.epsilon = 0.1
@@ -17,7 +21,7 @@ class Agent:
     def __init__(self, policy):
         # (dx, dy) -> [award of jump, award of do nothing]
         self.qtable = {}
-        self.award = {True: 1, False: -1000}
+        self.award = {ALIVE: 1, PASSPIPE: 100, DEAD: -1000}
         self.discountFactor = 0.5
         self.learnRate = 0.6
         self.policy = policy
@@ -39,14 +43,14 @@ class Agent:
         return action == JUMP
 
     # feeback gives feedback of previous action
-    def feedback(self, player, upipe, lpipe, alive):
+    def feedback(self, player, upipe, lpipe, result):
         if self.prevState is None:
             return
 
         state = self.getState(player, lpipe)
         optimalFuture = max(self.qtable[state])
         oldValue = self.qtable[self.prevState][self.prevAction]
-        reward = self.award[alive]
+        reward = self.award[result]
 
         # update
         self.qtable[self.prevState][self.prevAction] = \

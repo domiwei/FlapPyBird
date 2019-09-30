@@ -239,18 +239,6 @@ def mainGame(movementInfo, birdAgent):
        #             playerFlapped = True
        #             SOUNDS['wing'].play()
 
-        if len(upperPipes)>0 and len(lowerPipes)>0:
-            playerPos, upipePos, lpipePos = getPos(playerx, playery, upperPipes, lowerPipes, pipeW)
-            birdAgent.feedback(playerPos, upipePos, lpipePos, alive=True)
-            if birdAgent.jump(playerPos, upipePos, lpipePos):
-                if playery > -2 * IMAGES['player'][0].get_height():
-                    playerVelY = playerFlapAcc
-                    playerFlapped = True
-                    SOUNDS['wing'].play()
-
-
-        #print(playerx, playery)
-
         # check for score
         playerMidPos = playerx + IMAGES['player'][0].get_width() / 2
         for pipe in upperPipes:
@@ -258,6 +246,19 @@ def mainGame(movementInfo, birdAgent):
             if pipeMidPos <= playerMidPos < pipeMidPos + 4:
                 score += 1
                 SOUNDS['point'].play()
+                playerPos, upipePos, lpipePos = getPos(playerx, playery, upperPipes, lowerPipes, pipeW)
+                birdAgent.feedback(playerPos, upipePos, lpipePos, agent.PASSPIPE)
+
+
+        if len(upperPipes)>0 and len(lowerPipes)>0:
+            playerPos, upipePos, lpipePos = getPos(playerx, playery, upperPipes, lowerPipes, pipeW)
+            birdAgent.feedback(playerPos, upipePos, lpipePos, agent.ALIVE)
+            if birdAgent.jump(playerPos, upipePos, lpipePos):
+                if playery > -2 * IMAGES['player'][0].get_height():
+                    playerVelY = playerFlapAcc
+                    playerFlapped = True
+                    SOUNDS['wing'].play()
+
 
         # playerIndex basex change
         if (loopIter + 1) % 3 == 0:
@@ -291,7 +292,7 @@ def mainGame(movementInfo, birdAgent):
                                upperPipes, lowerPipes)
         if crashTest[0]:
             playerPos, upipePos, lpipePos = getPos(playerx, playery, upperPipes, lowerPipes, pipeW)
-            birdAgent.feedback(playerPos, upipePos, lpipePos, alive=False)
+            birdAgent.feedback(playerPos, upipePos, lpipePos, agent.DEAD)
             return {
                 'y': playery,
                 'groundCrash': crashTest[1],
