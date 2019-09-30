@@ -240,17 +240,7 @@ def mainGame(movementInfo, birdAgent):
        #             SOUNDS['wing'].play()
 
         if len(upperPipes)>0 and len(lowerPipes)>0:
-            playerPos = {'x':playerx, 'y':playery}
-            upipePos = {}
-            lpipePos = {}
-            for upper in upperPipes:
-                if playerx < upper['x']:
-                    upipePos = {'x':upper['x']+pipeW/2, 'y':upper['y']}
-                    break
-            for lower in lowerPipes:
-                if playerx < lower['x']:
-                    lpipePos = {'x':lower['x']+pipeW/2, 'y':lower['y']}
-                    break
+            playerPos, upipePos, lpipePos = getPos(playerx, playery, upperPipes, lowerPipes)
             birdAgent.feedback(playerPos, upipePos, lpipePos, alive=True)
             if birdAgent.jump(playerPos, upipePos, lpipePos):
                 if playery > -2 * IMAGES['player'][0].get_height():
@@ -300,17 +290,7 @@ def mainGame(movementInfo, birdAgent):
         crashTest = checkCrash({'x': playerx, 'y': playery, 'index': playerIndex},
                                upperPipes, lowerPipes)
         if crashTest[0]:
-            playerPos = {'x':playerx, 'y':playery}
-            upipePos = {}
-            lpipePos = {}
-            for upper in upperPipes:
-                if playerx < upper['x']:
-                    upipePos = {'x':upper['x']+pipeW/2, 'y':upper['y']}
-                    break
-            for lower in lowerPipes:
-                if playerx < lower['x']:
-                    lpipePos = {'x':lower['x']+pipeW/2, 'y':lower['y']}
-                    break
+            playerPos, upipePos, lpipePos = getPos(playerx, playery, upperPipes, lowerPipes)
             birdAgent.feedback(playerPos, upipePos, lpipePos, alive=False)
             return {
                 'y': playery,
@@ -522,6 +502,20 @@ def getHitmask(image):
         for y in xrange(image.get_height()):
             mask[x].append(bool(image.get_at((x,y))[3]))
     return mask
+
+def getPos(playerx, playery, upperPipes, lowerPipes):
+            playerPos = {'x':playerx, 'y':playery}
+            upipePos = {}
+            lpipePos = {}
+            for upper in upperPipes:
+                if playerx < upper['x']:
+                    upipePos = {'x':upper['x']+pipeW/2, 'y':upper['y']}
+                    break
+            for lower in lowerPipes:
+                if playerx < lower['x']:
+                    lpipePos = {'x':lower['x']+pipeW/2, 'y':lower['y']}
+                    break
+
 
 if __name__ == '__main__':
     main()
