@@ -17,7 +17,7 @@ class Agent:
     def __init__(self, policy):
         # (dx, dy) -> [award of jump, award of do nothing]
         self.qtable = {}
-        self.award = {True: 1, False: -100}
+        self.award = {True: 1, False: -1000}
         self.discountFactor = 0.5
         self.learnRate = 0.6
         self.policy = policy
@@ -29,29 +29,22 @@ class Agent:
     def jump(self, player, upipe, lpipe):
         #dx = int(upipe['x'] - player['x'])
         #dy = int((lpipe['y'] + upipe['y'])/2.0 - player['y'])
-        dx = int((lpipe['x'] - player['x'])/4)
-        dy = int((lpipe['y'] - player['y'])/4)
-        if (dx, dy) not in self.qtable:
-            self.qtable[(dx, dy)] = [random.random(), random.random()+1]
-        action = self.policy.takeAction(self.qtable[(dx, dy)])
+        state = self.getState(player, lpipe)
+        action = self.policy.takeAction(self.qtable[state])
  #       print(player, lpipe, upipe, dx, dy)
- #       time.sleep(1)
- #       if dy < -10:
-            # adhoc
- #           action = PAUSE
+        #print(state)
+        #time.sleep(0.3)
         self.prevAction = action
-        self.prevState = (dx, dy)
+        self.prevState = state
         return action == JUMP
 
     # feeback gives feedback of previous action
     def feedback(self, player, upipe, lpipe, alive):
         if self.prevState is None:
             return
-        dx = int(upipe['x'] - player['x'])
-        dy = int((lpipe['y'] + upipe['y'])/2.0 - player['y'])
-        if (dx, dy) not in self.qtable:
-            self.qtable[(dx, dy)] = [random.random(), random.random()+1]
-        optimalFuture = max(self.qtable[(dx, dy)])
+
+        state = self.getState(player, lpipe)
+        optimalFuture = max(self.qtable[state])
         oldValue = self.qtable[self.prevState][self.prevAction]
         reward = self.award[alive]
 
@@ -63,4 +56,13 @@ class Agent:
         if time.time() - self.prevTimestamp > 3:
             print("table size: ", len(self.qtable))
             self.prevTimestamp = time.time()
+
+    def getState(self, player, lpipe):
+        dx = int((lpipe['x'] - player['x'])/8)
+        dy = int((lpipe['y'] - player['y'])/8)
+        playerY = int(player['y']/8)
+        state = (dx, dy, playerY)
+        if state not in self.qtable:
+            self.qtable[state] = [random.random(), random.random()+0.9]
+        return state
 

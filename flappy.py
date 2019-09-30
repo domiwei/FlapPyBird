@@ -504,16 +504,18 @@ def getHitmask(image):
     return mask
 
 def getPos(playerx, playery, upperPipes, lowerPipes, pipeW):
+    #playerw = IMAGES['player'][0].get_width()
+    #playerh = IMAGES['player'][0].get_height()
     playerPos = {'x':playerx, 'y':playery}
     upipePos = {}
     lpipePos = {}
     for upper in upperPipes:
         if playerx < upper['x']:
-            upipePos = {'x':upper['x']+pipeW/2, 'y':upper['y']}
+            upipePos = {'x':upper['x'], 'y':upper['y']}
             break
     for lower in lowerPipes:
         if playerx < lower['x']:
-            lpipePos = {'x':lower['x']+pipeW/2, 'y':lower['y']}
+            lpipePos = {'x':lower['x'], 'y':lower['y']}
             break
     return playerPos, upipePos, lpipePos
 
