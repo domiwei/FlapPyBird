@@ -227,6 +227,7 @@ def mainGame(movementInfo, birdAgent):
     playerFlapped = False # True when player flaps
 
 
+    pipeW = IMAGES['pipe'][0].get_width()
     while True:
        # for event in pygame.event.get():
        #     if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
@@ -240,8 +241,16 @@ def mainGame(movementInfo, birdAgent):
 
         if len(upperPipes)>0 and len(lowerPipes)>0:
             playerPos = {'x':playerx, 'y':playery}
-            upipePos = {'x':upperPipes[-1]['x'], 'y':upperPipes[-1]['y']}
-            lpipePos = {'x':lowerPipes[-1]['x'], 'y':lowerPipes[-1]['y']}
+            upipePos = {}
+            lpipePos = {}
+            for upper in upperPipes:
+                if playerx < upper['x']:
+                    upipePos = {'x':upper['x']+pipeW/2, 'y':upper['y']}
+                    break
+            for lower in lowerPipes:
+                if playerx < lower['x']:
+                    lpipePos = {'x':lower['x']+pipeW/2, 'y':lower['y']}
+                    break
             birdAgent.feedback(playerPos, upipePos, lpipePos, alive=True)
             if birdAgent.jump(playerPos, upipePos, lpipePos):
                 if playery > -2 * IMAGES['player'][0].get_height():
@@ -251,20 +260,6 @@ def mainGame(movementInfo, birdAgent):
 
 
         #print(playerx, playery)
-        # check for crash here
-        crashTest = checkCrash({'x': playerx, 'y': playery, 'index': playerIndex},
-                               upperPipes, lowerPipes)
-        if crashTest[0]:
-            return {
-                'y': playery,
-                'groundCrash': crashTest[1],
-                'basex': basex,
-                'upperPipes': upperPipes,
-                'lowerPipes': lowerPipes,
-                'score': score,
-                'playerVelY': playerVelY,
-                'playerRot': playerRot
-            }
 
         # check for score
         playerMidPos = playerx + IMAGES['player'][0].get_width() / 2
@@ -300,6 +295,33 @@ def mainGame(movementInfo, birdAgent):
         for uPipe, lPipe in zip(upperPipes, lowerPipes):
             uPipe['x'] += pipeVelX
             lPipe['x'] += pipeVelX
+
+        # check for crash here
+        crashTest = checkCrash({'x': playerx, 'y': playery, 'index': playerIndex},
+                               upperPipes, lowerPipes)
+        if crashTest[0]:
+            playerPos = {'x':playerx, 'y':playery}
+            upipePos = {}
+            lpipePos = {}
+            for upper in upperPipes:
+                if playerx < upper['x']:
+                    upipePos = {'x':upper['x']+pipeW/2, 'y':upper['y']}
+                    break
+            for lower in lowerPipes:
+                if playerx < lower['x']:
+                    lpipePos = {'x':lower['x']+pipeW/2, 'y':lower['y']}
+                    break
+            birdAgent.feedback(playerPos, upipePos, lpipePos, alive=False)
+            return {
+                'y': playery,
+                'groundCrash': crashTest[1],
+                'basex': basex,
+                'upperPipes': upperPipes,
+                'lowerPipes': lowerPipes,
+                'score': score,
+                'playerVelY': playerVelY,
+                'playerRot': playerRot
+            }
 
         # add new pipe when first pipe is about to touch left of screen
         if 0 < upperPipes[0]['x'] < 5:
