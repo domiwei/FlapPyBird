@@ -1,6 +1,7 @@
 from itertools import cycle
 import random
 import sys
+import agent
 
 import pygame
 from pygame.locals import *
@@ -95,6 +96,7 @@ def main():
     SOUNDS['swoosh'] = pygame.mixer.Sound('assets/audio/swoosh' + soundExt)
     SOUNDS['wing']   = pygame.mixer.Sound('assets/audio/wing' + soundExt)
 
+    birdAgent = agent.Agent(agent.EpsilonGreedy())
     while True:
         # select random background sprites
         randBg = random.randint(0, len(BACKGROUNDS_LIST) - 1)
@@ -130,7 +132,7 @@ def main():
         )
 
         movementInfo = showWelcomeAnimation()
-        crashInfo = mainGame(movementInfo)
+        crashInfo = mainGame(movementInfo, birdAgent)
         showGameOverScreen(crashInfo)
 
 
@@ -156,18 +158,18 @@ def showWelcomeAnimation():
     playerShmVals = {'val': 0, 'dir': 1}
 
     while True:
-        for event in pygame.event.get():
-            if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
-                pygame.quit()
-                sys.exit()
-            if event.type == KEYDOWN and (event.key == K_SPACE or event.key == K_UP):
+        #for event in pygame.event.get():
+        #    if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
+        #        pygame.quit()
+        #        sys.exit()
+        #    if event.type == KEYDOWN and (event.key == K_SPACE or event.key == K_UP):
                 # make first flap sound and return values for mainGame
-                SOUNDS['wing'].play()
-                return {
-                    'playery': playery + playerShmVals['val'],
-                    'basex': basex,
-                    'playerIndexGen': playerIndexGen,
-                }
+        SOUNDS['wing'].play()
+        return {
+                'playery': playery + playerShmVals['val'],
+                'basex': basex,
+                'playerIndexGen': playerIndexGen,
+        }
 
         # adjust playery, playerIndex, basex
         if (loopIter + 1) % 5 == 0:
@@ -187,7 +189,7 @@ def showWelcomeAnimation():
         FPSCLOCK.tick(FPS)
 
 
-def mainGame(movementInfo):
+def mainGame(movementInfo, birdAgent):
     score = playerIndex = loopIter = 0
     playerIndexGen = movementInfo['playerIndexGen']
     playerx, playery = int(SCREENWIDTH * 0.2), movementInfo['playery']
@@ -226,16 +228,29 @@ def mainGame(movementInfo):
 
 
     while True:
-        for event in pygame.event.get():
-            if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
-                pygame.quit()
-                sys.exit()
-            if event.type == KEYDOWN and (event.key == K_SPACE or event.key == K_UP):
+       # for event in pygame.event.get():
+       #     if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
+       #         pygame.quit()
+       #         sys.exit()
+       #     if event.type == KEYDOWN and (event.key == K_SPACE or event.key == K_UP):
+       #         if playery > -2 * IMAGES['player'][0].get_height():
+       #             playerVelY = playerFlapAcc
+       #             playerFlapped = True
+       #             SOUNDS['wing'].play()
+
+        if len(upperPipes)>0 and len(lowerPipes)>0:
+            playerPos = {'x':playerx, 'y':playery}
+            upipePos = {'x':upperPipes[-1]['x'], 'y':upperPipes[-1]['y']}
+            lpipePos = {'x':lowerPipes[-1]['x'], 'y':lowerPipes[-1]['y']}
+            birdAgent.feedback(playerPos, upipePos, lpipePos, alive=True)
+            if birdAgent.jump(playerPos, upipePos, lpipePos):
                 if playery > -2 * IMAGES['player'][0].get_height():
                     playerVelY = playerFlapAcc
                     playerFlapped = True
                     SOUNDS['wing'].play()
 
+
+        #print(playerx, playery)
         # check for crash here
         crashTest = checkCrash({'x': playerx, 'y': playery, 'index': playerIndex},
                                upperPipes, lowerPipes)
@@ -341,13 +356,13 @@ def showGameOverScreen(crashInfo):
         SOUNDS['die'].play()
 
     while True:
-        for event in pygame.event.get():
-            if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
-                pygame.quit()
-                sys.exit()
-            if event.type == KEYDOWN and (event.key == K_SPACE or event.key == K_UP):
-                if playery + playerHeight >= BASEY - 1:
-                    return
+        #for event in pygame.event.get():
+        #    if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
+        #        pygame.quit()
+        #        sys.exit()
+        #    if event.type == KEYDOWN and (event.key == K_SPACE or event.key == K_UP):
+        #        if playery + playerHeight >= BASEY - 1:
+        #            return
 
         # player y shift
         if playery + playerHeight < BASEY - 1:
@@ -381,6 +396,9 @@ def showGameOverScreen(crashInfo):
 
         FPSCLOCK.tick(FPS)
         pygame.display.update()
+
+        if playery + playerHeight >= BASEY - 1:
+            return
 
 
 def playerShm(playerShm):
