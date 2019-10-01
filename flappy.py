@@ -7,10 +7,10 @@ import pygame
 from pygame.locals import *
 
 
-FPS = 30
+FPS = 300
 SCREENWIDTH  = 288
 SCREENHEIGHT = 512
-PIPEGAPSIZE  = 100 # gap between upper and lower part of pipe
+PIPEGAPSIZE  = 110 # gap between upper and lower part of pipe
 BASEY        = SCREENHEIGHT * 0.79
 # image, sound and hitmask  dicts
 IMAGES, SOUNDS, HITMASKS = {}, {}, {}
@@ -201,16 +201,17 @@ def mainGame(movementInfo, birdAgent):
     newPipe1 = getRandomPipe()
     newPipe2 = getRandomPipe()
 
+    k = -90
     # list of upper pipes
     upperPipes = [
-        {'x': SCREENWIDTH + 200, 'y': newPipe1[0]['y']},
-        {'x': SCREENWIDTH + 200 + (SCREENWIDTH / 2), 'y': newPipe2[0]['y']},
+        {'x': SCREENWIDTH + k, 'y': newPipe1[0]['y']},
+        {'x': SCREENWIDTH + k + (SCREENWIDTH / 2), 'y': newPipe2[0]['y']},
     ]
 
     # list of lowerpipe
     lowerPipes = [
-        {'x': SCREENWIDTH + 200, 'y': newPipe1[1]['y']},
-        {'x': SCREENWIDTH + 200 + (SCREENWIDTH / 2), 'y': newPipe2[1]['y']},
+        {'x': SCREENWIDTH + k, 'y': newPipe1[1]['y']},
+        {'x': SCREENWIDTH + k + (SCREENWIDTH / 2), 'y': newPipe2[1]['y']},
     ]
 
     pipeVelX = -4
@@ -223,7 +224,7 @@ def mainGame(movementInfo, birdAgent):
     playerRot     =  45   # player's rotation
     playerVelRot  =   3   # angular speed
     playerRotThr  =  20   # rotation threshold
-    playerFlapAcc =  -9   # players speed on flapping
+    playerFlapAcc =  -5   # players speed on flapping
     playerFlapped = False # True when player flaps
 
 
@@ -246,11 +247,11 @@ def mainGame(movementInfo, birdAgent):
             if pipeMidPos <= playerMidPos < pipeMidPos + 4:
                 score += 1
                 SOUNDS['point'].play()
-                playerPos, upipePos, lpipePos = getPos(playerx, playery, upperPipes, lowerPipes, pipeW)
+                playerPos, upipePos, lpipePos = getPos(playerx, playery, playerVelY, upperPipes, lowerPipes, pipeW)
                 birdAgent.feedback(playerPos, upipePos, lpipePos, agent.PASSPIPE)
 
         if len(upperPipes)>0 and len(lowerPipes)>0:
-            playerPos, upipePos, lpipePos = getPos(playerx, playery, upperPipes, lowerPipes, pipeW)
+            playerPos, upipePos, lpipePos = getPos(playerx, playery, playerVelY, upperPipes, lowerPipes, pipeW)
             birdAgent.feedback(playerPos, upipePos, lpipePos, agent.ALIVE)
             if birdAgent.jump(playerPos, upipePos, lpipePos):
                 if playery > -2 * IMAGES['player'][0].get_height():
@@ -290,7 +291,7 @@ def mainGame(movementInfo, birdAgent):
         crashTest = checkCrash({'x': playerx, 'y': playery, 'index': playerIndex},
                                upperPipes, lowerPipes)
         if crashTest[0]:
-            playerPos, upipePos, lpipePos = getPos(playerx, playery, upperPipes, lowerPipes, pipeW)
+            playerPos, upipePos, lpipePos = getPos(playerx, playery, playerVelY, upperPipes, lowerPipes, pipeW)
             birdAgent.feedback(playerPos, upipePos, lpipePos, agent.DEAD)
             return {
                 'y': playery,
@@ -335,7 +336,6 @@ def mainGame(movementInfo, birdAgent):
 
         pygame.display.update()
         FPSCLOCK.tick(FPS)
-
 
 def showGameOverScreen(crashInfo):
     """crashes the player down ans shows gameover image"""
@@ -503,19 +503,19 @@ def getHitmask(image):
             mask[x].append(bool(image.get_at((x,y))[3]))
     return mask
 
-def getPos(playerx, playery, upperPipes, lowerPipes, pipeW):
-    #playerw = IMAGES['player'][0].get_width()
-    #playerh = IMAGES['player'][0].get_height()
-    playerPos = {'x':playerx, 'y':playery}
+def getPos(playerx, playery, playerV, upperPipes, lowerPipes, pipeW):
+    playerw = IMAGES['player'][0].get_width()
+    playerh = IMAGES['player'][0].get_height()
+    playerPos = {'x':playerx+playerw/2, 'y':playery, 'v': playerV}
     upipePos = {}
     lpipePos = {}
     for upper in upperPipes:
         if playerx < upper['x']:
-            upipePos = {'x':upper['x'], 'y':upper['y']}
+            upipePos = {'x':upper['x']+pipeW, 'y':upper['y']}
             break
     for lower in lowerPipes:
         if playerx < lower['x']:
-            lpipePos = {'x':lower['x'], 'y':lower['y']}
+            lpipePos = {'x':lower['x']+pipeW, 'y':lower['y']}
             break
     return playerPos, upipePos, lpipePos
 
