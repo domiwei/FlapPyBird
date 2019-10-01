@@ -163,14 +163,8 @@ def showWelcomeAnimation():
         #        pygame.quit()
         #        sys.exit()
         #    if event.type == KEYDOWN and (event.key == K_SPACE or event.key == K_UP):
-                # make first flap sound and return values for mainGame
-        SOUNDS['wing'].play()
-        return {
-                'playery': playery + playerShmVals['val'],
-                'basex': basex,
-                'playerIndexGen': playerIndexGen,
-        }
-
+                 #make first flap sound and return values for mainGame
+        #        SOUNDS['wing'].play()
         # adjust playery, playerIndex, basex
         if (loopIter + 1) % 5 == 0:
             playerIndex = next(playerIndexGen)
@@ -187,6 +181,12 @@ def showWelcomeAnimation():
 
         pygame.display.update()
         FPSCLOCK.tick(FPS)
+        return {
+            'playery': playery + playerShmVals['val'],
+            'basex': basex,
+            'playerIndexGen': playerIndexGen,
+        }
+
 
 
 def mainGame(movementInfo, birdAgent):
@@ -229,15 +229,15 @@ def mainGame(movementInfo, birdAgent):
 
     pipeW = IMAGES['pipe'][0].get_width()
     while True:
-       # for event in pygame.event.get():
-       #     if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
-       #         pygame.quit()
-       #         sys.exit()
-       #     if event.type == KEYDOWN and (event.key == K_SPACE or event.key == K_UP):
-       #         if playery > -2 * IMAGES['player'][0].get_height():
-       #             playerVelY = playerFlapAcc
-       #             playerFlapped = True
-       #             SOUNDS['wing'].play()
+        for event in pygame.event.get():
+            if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
+                pygame.quit()
+                sys.exit()
+            if event.type == KEYDOWN and (event.key == K_SPACE or event.key == K_UP):
+                if playery > -2 * IMAGES['player'][0].get_height():
+                    playerVelY = playerFlapAcc
+                    playerFlapped = True
+                    SOUNDS['wing'].play()
 
         # check for score
         playerMidPos = playerx + IMAGES['player'][0].get_width() / 2
@@ -248,7 +248,6 @@ def mainGame(movementInfo, birdAgent):
                 SOUNDS['point'].play()
                 playerPos, upipePos, lpipePos = getPos(playerx, playery, upperPipes, lowerPipes, pipeW)
                 birdAgent.feedback(playerPos, upipePos, lpipePos, agent.PASSPIPE)
-
 
         if len(upperPipes)>0 and len(lowerPipes)>0:
             playerPos, upipePos, lpipePos = getPos(playerx, playery, upperPipes, lowerPipes, pipeW)
