@@ -192,7 +192,7 @@ def showWelcomeAnimation():
 def mainGame(movementInfo, birdAgent):
     score = playerIndex = loopIter = 0
     playerIndexGen = movementInfo['playerIndexGen']
-    playerx, playery = int(SCREENWIDTH * 0.2), movementInfo['playery'] -random.randint(0, 100)
+    playerx, playery = int(SCREENWIDTH * 0.2), movementInfo['playery'] - random.randint(0, 200)
 
     basex = movementInfo['basex']
     baseShift = IMAGES['base'].get_width() - IMAGES['background'].get_width()
@@ -224,11 +224,12 @@ def mainGame(movementInfo, birdAgent):
     playerRot     =  45   # player's rotation
     playerVelRot  =   3   # angular speed
     playerRotThr  =  20   # rotation threshold
-    playerFlapAcc =  -5   # players speed on flapping
+    playerFlapAcc =  -6   # players speed on flapping
     playerFlapped = False # True when player flaps
 
 
     pipeW = IMAGES['pipe'][0].get_width()
+    count = 0
     while True:
         for event in pygame.event.get():
             if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
@@ -248,16 +249,18 @@ def mainGame(movementInfo, birdAgent):
                 score += 1
                 SOUNDS['point'].play()
                 playerPos, upipePos, lpipePos = getPos(playerx, playery, playerVelY, upperPipes, lowerPipes, pipeW)
-                birdAgent.feedback(playerPos, upipePos, lpipePos, agent.PASSPIPE)
+                if count%3==0:
+                    birdAgent.feedback(playerPos, upipePos, lpipePos, agent.PASSPIPE)
 
         if len(upperPipes)>0 and len(lowerPipes)>0:
             playerPos, upipePos, lpipePos = getPos(playerx, playery, playerVelY, upperPipes, lowerPipes, pipeW)
-            birdAgent.feedback(playerPos, upipePos, lpipePos, agent.ALIVE)
-            if birdAgent.jump(playerPos, upipePos, lpipePos):
-                if playery > -2 * IMAGES['player'][0].get_height():
-                    playerVelY = playerFlapAcc
-                    playerFlapped = True
-                    SOUNDS['wing'].play()
+            if count%3==0:
+                birdAgent.feedback(playerPos, upipePos, lpipePos, agent.ALIVE)
+                if birdAgent.jump(playerPos, upipePos, lpipePos):
+                    if playery > -2 * IMAGES['player'][0].get_height():
+                        playerVelY = playerFlapAcc
+                        playerFlapped = True
+                        SOUNDS['wing'].play()
 
 
         # playerIndex basex change
@@ -337,6 +340,7 @@ def mainGame(movementInfo, birdAgent):
 
         pygame.display.update()
         FPSCLOCK.tick(FPS)
+        count += 1
 
 def showGameOverScreen(crashInfo):
     """crashes the player down ans shows gameover image"""

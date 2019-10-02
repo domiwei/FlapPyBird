@@ -11,7 +11,7 @@ DEAD = 2
 
 class EpsilonGreedy:
     def __init__(self):
-        self.epsilon = 0.1
+        self.epsilon = 0.05
 
     def takeAction(self, actions):
         if random.random() > self.epsilon:
@@ -24,7 +24,7 @@ class Agent:
         self.qtable = {}
         self.award = {ALIVE: 1, PASSPIPE: 1000, DEAD: -1000}
         self.discountFactor = 0.8
-        self.learnRate = 0.6
+        self.learnRate = 0.8
         self.policy = policy
         self.prevAction = PAUSE
         self.prevState = None
@@ -56,8 +56,8 @@ class Agent:
         optimalFuture = max(self.qtable[state])
         oldValue = self.qtable[self.prevState][self.prevAction]
         reward = self.award[result]
-  #      if result == ALIVE: # try to discount
-  #          reward = max(1, 1000*math.exp(-abs(state[1]-10)))
+        if result == ALIVE and state[1]>30: # try to discount
+            reward = (-1.0*math.exp(abs(state[1]-30)/4))
 
         # update
         self.qtable[self.prevState][self.prevAction] = \
