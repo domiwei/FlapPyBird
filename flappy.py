@@ -7,6 +7,7 @@ import argparse
 import pygame
 from pygame.locals import *
 
+gameRound = 0
 FPS = 300
 SCREENWIDTH  = 288
 SCREENHEIGHT = 512
@@ -104,44 +105,46 @@ def main():
     SOUNDS['swoosh'] = pygame.mixer.Sound('assets/audio/swoosh' + soundExt)
     SOUNDS['wing']   = pygame.mixer.Sound('assets/audio/wing' + soundExt)
 
-    birdAgent = agent.Agent(agent.EpsilonGreedy(), modelfile, args.write=='y')
-    while True:
+    birdAgent = agent.Agent(agent.EpsilonGreedy())
         # select random background sprites
-        randBg = random.randint(0, len(BACKGROUNDS_LIST) - 1)
-        IMAGES['background'] = pygame.image.load(BACKGROUNDS_LIST[randBg]).convert()
+        
+    randBg = random.randint(0, len(BACKGROUNDS_LIST) - 1)
+    IMAGES['background'] = pygame.image.load(BACKGROUNDS_LIST[randBg]).convert()
 
         # select random player sprites
-        randPlayer = random.randint(0, len(PLAYERS_LIST) - 1)
-        IMAGES['player'] = (
+    randPlayer = random.randint(0, len(PLAYERS_LIST) - 1)
+    IMAGES['player'] = (
             pygame.image.load(PLAYERS_LIST[randPlayer][0]).convert_alpha(),
             pygame.image.load(PLAYERS_LIST[randPlayer][1]).convert_alpha(),
             pygame.image.load(PLAYERS_LIST[randPlayer][2]).convert_alpha(),
-        )
+    )
 
         # select random pipe sprites
-        pipeindex = random.randint(0, len(PIPES_LIST) - 1)
-        IMAGES['pipe'] = (
+    pipeindex = random.randint(0, len(PIPES_LIST) - 1)
+    IMAGES['pipe'] = (
             pygame.transform.flip(
                 pygame.image.load(PIPES_LIST[pipeindex]).convert_alpha(), False, True),
             pygame.image.load(PIPES_LIST[pipeindex]).convert_alpha(),
-        )
+    )
 
         # hismask for pipes
-        HITMASKS['pipe'] = (
+    HITMASKS['pipe'] = (
             getHitmask(IMAGES['pipe'][0]),
             getHitmask(IMAGES['pipe'][1]),
-        )
+    )
 
         # hitmask for player
-        HITMASKS['player'] = (
+    HITMASKS['player'] = (
             getHitmask(IMAGES['player'][0]),
             getHitmask(IMAGES['player'][1]),
             getHitmask(IMAGES['player'][2]),
-        )
-
+    )
+    global gameRound
+    while True:
         movementInfo = showWelcomeAnimation()
+        gameRound += 1
         crashInfo = mainGame(movementInfo, birdAgent)
-        showGameOverScreen(crashInfo)
+        #showGameOverScreen(crashInfo)
 
 
 def showWelcomeAnimation():
@@ -181,14 +184,14 @@ def showWelcomeAnimation():
         playerShm(playerShmVals)
 
         # draw sprites
-        SCREEN.blit(IMAGES['background'], (0,0))
-        SCREEN.blit(IMAGES['player'][playerIndex],
-                    (playerx, playery + playerShmVals['val']))
-        SCREEN.blit(IMAGES['message'], (messagex, messagey))
-        SCREEN.blit(IMAGES['base'], (basex, BASEY))
+        #SCREEN.blit(IMAGES['background'], (0,0))
+        #SCREEN.blit(IMAGES['player'][playerIndex],
+                    #(playerx, playery + playerShmVals['val']))
+        #SCREEN.blit(IMAGES['message'], (messagex, messagey))
+        #SCREEN.blit(IMAGES['base'], (basex, BASEY))
 
-        pygame.display.update()
-        FPSCLOCK.tick(FPS)
+        #pygame.display.update()
+        #FPSCLOCK.tick(FPS)
         return {
             'playery': playery + playerShmVals['val'],
             'basex': basex,
@@ -239,15 +242,15 @@ def mainGame(movementInfo, birdAgent):
     pipeW = IMAGES['pipe'][0].get_width()
     count = 0
     while True:
-        for event in pygame.event.get():
+        '''for event in pygame.event.get():
             if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
                 pygame.quit()
                 sys.exit()
             if event.type == KEYDOWN and (event.key == K_SPACE or event.key == K_UP):
                 if playery > -2 * IMAGES['player'][0].get_height():
                     playerVelY = playerFlapAcc
-                    playerFlapped = True
-                    SOUNDS['wing'].play()
+                    playerFlapped = True'''
+                    #SOUNDS['wing'].play()
 
         # check for score
         playerMidPos = playerx + IMAGES['player'][0].get_width() / 2
@@ -255,7 +258,7 @@ def mainGame(movementInfo, birdAgent):
             pipeMidPos = pipe['x'] + IMAGES['pipe'][0].get_width() / 2
             if pipeMidPos <= playerMidPos < pipeMidPos + 4:
                 score += 1
-                SOUNDS['point'].play()
+                #SOUNDS['point'].play()
                 playerPos, upipePos, lpipePos = getPos(playerx, playery, playerVelY, upperPipes, lowerPipes, pipeW)
                 if count%4==0:
                     birdAgent.feedback(playerPos, upipePos, lpipePos, agent.PASSPIPE)
@@ -268,7 +271,7 @@ def mainGame(movementInfo, birdAgent):
                     if playery > -2 * IMAGES['player'][0].get_height():
                         playerVelY = playerFlapAcc
                         playerFlapped = True
-                        SOUNDS['wing'].play()
+                        #SOUNDS['wing'].play()
 
 
         # playerIndex basex change
@@ -304,7 +307,7 @@ def mainGame(movementInfo, birdAgent):
         if crashTest[0]:
             playerPos, upipePos, lpipePos = getPos(playerx, playery, playerVelY, upperPipes, lowerPipes, pipeW)
             birdAgent.feedback(playerPos, upipePos, lpipePos, agent.DEAD)
-            print("score:", score)
+            print("round: ", gameRound, ", score: ", score)
             return {
                 'y': playery,
                 'groundCrash': crashTest[1],
@@ -328,13 +331,13 @@ def mainGame(movementInfo, birdAgent):
             lowerPipes.pop(0)
 
         # draw sprites
-        SCREEN.blit(IMAGES['background'], (0,0))
+        #SCREEN.blit(IMAGES['background'], (0,0))
 
-        for uPipe, lPipe in zip(upperPipes, lowerPipes):
-            SCREEN.blit(IMAGES['pipe'][0], (uPipe['x'], uPipe['y']))
-            SCREEN.blit(IMAGES['pipe'][1], (lPipe['x'], lPipe['y']))
+        #for uPipe, lPipe in zip(upperPipes, lowerPipes):
+        #    SCREEN.blit(IMAGES['pipe'][0], (uPipe['x'], uPipe['y']))
+        #    SCREEN.blit(IMAGES['pipe'][1], (lPipe['x'], lPipe['y']))
 
-        SCREEN.blit(IMAGES['base'], (basex, BASEY))
+        #SCREEN.blit(IMAGES['base'], (basex, BASEY))
         # print score so player overlaps the score
         showScore(score)
 
@@ -343,11 +346,11 @@ def mainGame(movementInfo, birdAgent):
         if playerRot <= playerRotThr:
             visibleRot = playerRot
         
-        playerSurface = pygame.transform.rotate(IMAGES['player'][playerIndex], visibleRot)
-        SCREEN.blit(playerSurface, (playerx, playery))
+        #playerSurface = pygame.transform.rotate(IMAGES['player'][playerIndex], visibleRot)
+        #SCREEN.blit(playerSurface, (playerx, playery))
 
-        pygame.display.update()
-        FPSCLOCK.tick(FPS)
+        #pygame.display.update()
+        #FPSCLOCK.tick(FPS)
         count += 1
 
 def showGameOverScreen(crashInfo):
@@ -366,9 +369,9 @@ def showGameOverScreen(crashInfo):
     upperPipes, lowerPipes = crashInfo['upperPipes'], crashInfo['lowerPipes']
 
     # play hit and die sounds
-    SOUNDS['hit'].play()
-    if not crashInfo['groundCrash']:
-        SOUNDS['die'].play()
+    #SOUNDS['hit'].play()
+    #if not crashInfo['groundCrash']:
+    #    SOUNDS['die'].play()
 
     while True:
         #for event in pygame.event.get():
@@ -393,24 +396,24 @@ def showGameOverScreen(crashInfo):
                 playerRot -= playerVelRot
 
         # draw sprites
-        SCREEN.blit(IMAGES['background'], (0,0))
+        #SCREEN.blit(IMAGES['background'], (0,0))
 
-        for uPipe, lPipe in zip(upperPipes, lowerPipes):
-            SCREEN.blit(IMAGES['pipe'][0], (uPipe['x'], uPipe['y']))
-            SCREEN.blit(IMAGES['pipe'][1], (lPipe['x'], lPipe['y']))
+        #for uPipe, lPipe in zip(upperPipes, lowerPipes):
+        #    SCREEN.blit(IMAGES['pipe'][0], (uPipe['x'], uPipe['y']))
+        #    SCREEN.blit(IMAGES['pipe'][1], (lPipe['x'], lPipe['y']))
 
-        SCREEN.blit(IMAGES['base'], (basex, BASEY))
-        showScore(score)
+        #SCREEN.blit(IMAGES['base'], (basex, BASEY))
+        #showScore(score)
 
         
 
 
-        playerSurface = pygame.transform.rotate(IMAGES['player'][1], playerRot)
-        SCREEN.blit(playerSurface, (playerx,playery))
-        SCREEN.blit(IMAGES['gameover'], (50, 180))
+        #playerSurface = pygame.transform.rotate(IMAGES['player'][1], playerRot)
+        #SCREEN.blit(playerSurface, (playerx,playery))
+        #SCREEN.blit(IMAGES['gameover'], (50, 180))
 
-        FPSCLOCK.tick(FPS)
-        pygame.display.update()
+        #FPSCLOCK.tick(FPS)
+        #pygame.display.update()
 
         if playery + playerHeight >= BASEY - 1:
             return
