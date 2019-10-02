@@ -192,7 +192,7 @@ def showWelcomeAnimation():
 def mainGame(movementInfo, birdAgent):
     score = playerIndex = loopIter = 0
     playerIndexGen = movementInfo['playerIndexGen']
-    playerx, playery = int(SCREENWIDTH * 0.2), movementInfo['playery']
+    playerx, playery = int(SCREENWIDTH * 0.2), movementInfo['playery'] -random.randint(0, 100)
 
     basex = movementInfo['basex']
     baseShift = IMAGES['base'].get_width() - IMAGES['background'].get_width()
@@ -201,7 +201,7 @@ def mainGame(movementInfo, birdAgent):
     newPipe1 = getRandomPipe()
     newPipe2 = getRandomPipe()
 
-    k = -90
+    k = -80
     # list of upper pipes
     upperPipes = [
         {'x': SCREENWIDTH + k, 'y': newPipe1[0]['y']},
@@ -293,6 +293,7 @@ def mainGame(movementInfo, birdAgent):
         if crashTest[0]:
             playerPos, upipePos, lpipePos = getPos(playerx, playery, playerVelY, upperPipes, lowerPipes, pipeW)
             birdAgent.feedback(playerPos, upipePos, lpipePos, agent.DEAD)
+            print("score:", score)
             return {
                 'y': playery,
                 'groundCrash': crashTest[1],
@@ -506,15 +507,15 @@ def getHitmask(image):
 def getPos(playerx, playery, playerV, upperPipes, lowerPipes, pipeW):
     playerw = IMAGES['player'][0].get_width()
     playerh = IMAGES['player'][0].get_height()
-    playerPos = {'x':playerx+playerw/2, 'y':playery, 'v': playerV}
+    playerPos = {'x':playerx, 'y':playery, 'v': playerV}
     upipePos = {}
     lpipePos = {}
     for upper in upperPipes:
-        if playerx < upper['x']:
+        if playerx < upper['x']+pipeW:
             upipePos = {'x':upper['x']+pipeW, 'y':upper['y']}
             break
     for lower in lowerPipes:
-        if playerx < lower['x']:
+        if playerx < lower['x']+pipeW:
             lpipePos = {'x':lower['x']+pipeW, 'y':lower['y']}
             break
     return playerPos, upipePos, lpipePos
