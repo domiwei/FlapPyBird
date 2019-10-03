@@ -460,8 +460,8 @@ def showScore(score):
 def checkCrash(player, upperPipes, lowerPipes):
     """returns True if player collders with base or pipes."""
     pi = player['index']
-    player['w'] = IMAGES['player'][0].get_width()
-    player['h'] = IMAGES['player'][0].get_height()
+    player['w'] = int(IMAGES['player'][0].get_width()*0.6)
+    player['h'] = int(IMAGES['player'][0].get_height()*0.6)
 
     # if player crashes into ground
     if player['y'] + player['h'] >= BASEY - 1:
@@ -470,8 +470,8 @@ def checkCrash(player, upperPipes, lowerPipes):
 
         playerRect = pygame.Rect(player['x'], player['y'],
                       player['w'], player['h'])
-        pipeW = int(IMAGES['pipe'][0].get_width()*0.6)
-        pipeH = int(IMAGES['pipe'][0].get_height()*0.6)
+        pipeW = int(IMAGES['pipe'][0].get_width())
+        pipeH = int(IMAGES['pipe'][0].get_height())
 
         for uPipe, lPipe in zip(upperPipes, lowerPipes):
             # upper and lower pipe rects
