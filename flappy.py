@@ -2,6 +2,7 @@ from itertools import cycle
 import random
 import sys
 import agent
+import argparse
 
 import pygame
 from pygame.locals import *
@@ -63,6 +64,14 @@ def main():
     SCREEN = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT))
     pygame.display.set_caption('Flappy Bird')
 
+    #Define command line arguments
+    parser = argparse.ArgumentParser(description='hey')
+    parser.add_argument("-m", "--model", dest="model", help="input model file")
+    parser.add_argument("-w", "--write", dest="write", help="whether need to write model")
+    #parse command line arguments
+    args = parser.parse_args()
+    modelfile = args.model
+
     # numbers sprites for score display
     IMAGES['numbers'] = (
         pygame.image.load('assets/sprites/0.png').convert_alpha(),
@@ -96,7 +105,7 @@ def main():
     SOUNDS['swoosh'] = pygame.mixer.Sound('assets/audio/swoosh' + soundExt)
     SOUNDS['wing']   = pygame.mixer.Sound('assets/audio/wing' + soundExt)
 
-    birdAgent = agent.Agent(agent.EpsilonGreedy())
+    birdAgent = agent.Agent(agent.EpsilonGreedy(), modelfile, args.write=='y')
     while True:
         # select random background sprites
         randBg = random.randint(0, len(BACKGROUNDS_LIST) - 1)

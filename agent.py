@@ -1,6 +1,7 @@
 import random
 import time
 import math
+import json
 
 JUMP = 0
 PAUSE = 1
@@ -19,9 +20,14 @@ class EpsilonGreedy:
         return random.randint(0, len(actions)-1)
 
 class Agent:
-    def __init__(self, policy):
+    def __init__(self, policy, modelfile="", writemodel=True):
         # (dx, dy, ypos, yvel) -> [award of jump, award of do nothing]
         self.qtable = {}
+        if modelfile != "":
+            with open(modelfile, "r") as f:
+                model = f.readline()
+                print(model)
+                self.qtable = eval(model)
         self.award = {ALIVE: 1, PASSPIPE: 1000, DEAD: -1000}
         self.discountFactor = 0.8
         self.learnRate = 0.5
@@ -29,6 +35,7 @@ class Agent:
         self.prevAction = PAUSE
         self.prevState = None
         self.prevTimestamp = 0
+        self.writemodel = writemodel
 
     # jump returns true if decide to jump this moment
     def jump(self, player, upipe, lpipe):
@@ -66,8 +73,9 @@ class Agent:
 
         if time.time() - self.prevTimestamp > 5:
             print("table size: ", len(self.qtable))
-            with open("qtable.model", "w") as f:
-                f.write(str(self.qtable))
+            if self.writemodel:
+                with open("qtable.model", "w") as f:
+                    f.write(str(self.qtable))
             self.prevTimestamp = time.time()
 #            print(self.prevState, state, oldValue, self.qtable[self.prevState][self.prevAction])
 
