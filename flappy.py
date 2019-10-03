@@ -232,7 +232,7 @@ def mainGame(movementInfo, birdAgent):
     playerRot     =  45   # player's rotation
     playerVelRot  =   3   # angular speed
     playerRotThr  =  20   # rotation threshold
-    playerFlapAcc =  -6   # players speed on flapping
+    playerFlapAcc =  -5   # players speed on flapping
     playerFlapped = False # True when player flaps
 
 
@@ -257,12 +257,12 @@ def mainGame(movementInfo, birdAgent):
                 score += 1
                 SOUNDS['point'].play()
                 playerPos, upipePos, lpipePos = getPos(playerx, playery, playerVelY, upperPipes, lowerPipes, pipeW)
-                if count%4==0:
+                if count%2==0:
                     birdAgent.feedback(playerPos, upipePos, lpipePos, agent.PASSPIPE)
 
         if len(upperPipes)>0 and len(lowerPipes)>0:
             playerPos, upipePos, lpipePos = getPos(playerx, playery, playerVelY, upperPipes, lowerPipes, pipeW)
-            if count%4==0:
+            if count%2==0:
                 birdAgent.feedback(playerPos, upipePos, lpipePos, agent.ALIVE)
                 if birdAgent.jump(playerPos, upipePos, lpipePos):
                     if playery > -2 * IMAGES['player'][0].get_height():
