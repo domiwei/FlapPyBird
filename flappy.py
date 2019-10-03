@@ -7,7 +7,6 @@ import argparse
 import pygame
 from pygame.locals import *
 
-
 FPS = 300
 SCREENWIDTH  = 288
 SCREENHEIGHT = 512
