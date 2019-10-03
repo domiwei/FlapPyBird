@@ -7,7 +7,7 @@ import argparse
 import pygame
 from pygame.locals import *
 
-FPS = 300
+FPS = 50
 SCREENWIDTH  = 288
 SCREENHEIGHT = 512
 PIPEGAPSIZE  = 120 # gap between upper and lower part of pipe
