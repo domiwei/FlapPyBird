@@ -64,7 +64,7 @@ class Agent:
         oldValue = self.qtable[self.prevState][self.prevAction]
         reward = self.award[result]
         if result == ALIVE and state[1]>30: # try to discount
-            reward = (-1.0*math.exp(abs(state[1]-30)/4))
+            reward = (-1.0*math.exp(abs(state[1]-30)/2))
 
         # update
         self.qtable[self.prevState][self.prevAction] = \

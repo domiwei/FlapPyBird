@@ -520,7 +520,7 @@ def getHitmask(image):
 def getPos(playerx, playery, playerV, upperPipes, lowerPipes, pipeW):
     playerw = IMAGES['player'][0].get_width()
     playerh = IMAGES['player'][0].get_height()
-    playerPos = {'x':playerx, 'y':playery, 'v': playerV}
+    playerPos = {'x':playerx+playerw/2, 'y':playery+playerh/2, 'v': playerV}
     upipePos = {}
     lpipePos = {}
     for upper in upperPipes:
