@@ -8,7 +8,7 @@ import pygame
 from pygame.locals import *
 
 gameRound = 0
-totalScore = 0
+totalScore = []
 FPS = 300
 SCREENWIDTH  = 288
 SCREENHEIGHT = 512
@@ -204,7 +204,7 @@ def showWelcomeAnimation():
 def mainGame(movementInfo, birdAgent):
     score = playerIndex = loopIter = 0
     playerIndexGen = movementInfo['playerIndexGen']
-    playerx, playery = int(SCREENWIDTH * 0.2), movementInfo['playery'] - random.randint(0, 10)
+    playerx, playery = int(SCREENWIDTH * 0.2), movementInfo['playery'] - random.randint(0, 200)
 
     basex = movementInfo['basex']
     baseShift = IMAGES['base'].get_width() - IMAGES['background'].get_width()
@@ -312,10 +312,10 @@ def mainGame(movementInfo, birdAgent):
             playerPos, upipePos, lpipePos = getPos(playerx, playery, playerVelY, upperPipes, lowerPipes, pipeW)
             birdAgent.feedback(playerPos, upipePos, lpipePos, agent.DEAD)
             global totalScore
-            totalScore += score
+            totalScore.append(score)
             if gameRound%100==0:
-                print("round: ", gameRound, ", average score: ", totalScore/100)
-                totalScore = 0
+                print("round: ", gameRound, ", average score: ", sum(totalScore)/100, totalScore[:10])
+                totalScore = []
             return {
                 'y': playery,
                 'groundCrash': crashTest[1],
