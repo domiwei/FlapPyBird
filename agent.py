@@ -24,7 +24,7 @@ class Agent:
         self.qtable = {}
         self.award = {ALIVE: 1, PASSPIPE: 1000, DEAD: -1000}
         self.discountFactor = 0.8
-        self.learnRate = 0.8
+        self.learnRate = 0.5
         self.policy = policy
         self.prevAction = PAUSE
         self.prevState = None
