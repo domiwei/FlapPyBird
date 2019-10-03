@@ -8,6 +8,7 @@ import pygame
 from pygame.locals import *
 
 gameRound = 0
+totalScore = 0
 FPS = 300
 SCREENWIDTH  = 288
 SCREENHEIGHT = 512
@@ -203,7 +204,7 @@ def showWelcomeAnimation():
 def mainGame(movementInfo, birdAgent):
     score = playerIndex = loopIter = 0
     playerIndexGen = movementInfo['playerIndexGen']
-    playerx, playery = int(SCREENWIDTH * 0.2), movementInfo['playery'] - random.randint(0, 200)
+    playerx, playery = int(SCREENWIDTH * 0.2), movementInfo['playery'] - random.randint(0, 10)
 
     basex = movementInfo['basex']
     baseShift = IMAGES['base'].get_width() - IMAGES['background'].get_width()
@@ -266,6 +267,9 @@ def mainGame(movementInfo, birdAgent):
         if len(upperPipes)>0 and len(lowerPipes)>0:
             playerPos, upipePos, lpipePos = getPos(playerx, playery, playerVelY, upperPipes, lowerPipes, pipeW)
             if count%4==0:
+                #if playerPos['y']<=0:
+                #    birdAgent.feedback(playerPos, upipePos, lpipePos, agent.DEAD)
+                #else:
                 birdAgent.feedback(playerPos, upipePos, lpipePos, agent.ALIVE)
                 if birdAgent.jump(playerPos, upipePos, lpipePos):
                     if playery > -2 * IMAGES['player'][0].get_height():
@@ -307,7 +311,11 @@ def mainGame(movementInfo, birdAgent):
         if crashTest[0]:
             playerPos, upipePos, lpipePos = getPos(playerx, playery, playerVelY, upperPipes, lowerPipes, pipeW)
             birdAgent.feedback(playerPos, upipePos, lpipePos, agent.DEAD)
-            print("round: ", gameRound, ", score: ", score)
+            global totalScore
+            totalScore += score
+            if gameRound%100==0:
+                print("round: ", gameRound, ", average score: ", totalScore/100)
+                totalScore = 0
             return {
                 'y': playery,
                 'groundCrash': crashTest[1],
