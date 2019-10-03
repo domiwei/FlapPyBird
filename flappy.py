@@ -249,12 +249,12 @@ def mainGame(movementInfo, birdAgent):
                 score += 1
                 SOUNDS['point'].play()
                 playerPos, upipePos, lpipePos = getPos(playerx, playery, playerVelY, upperPipes, lowerPipes, pipeW)
-                if count%3==0:
+                if count%4==0:
                     birdAgent.feedback(playerPos, upipePos, lpipePos, agent.PASSPIPE)
 
         if len(upperPipes)>0 and len(lowerPipes)>0:
             playerPos, upipePos, lpipePos = getPos(playerx, playery, playerVelY, upperPipes, lowerPipes, pipeW)
-            if count%3==0:
+            if count%4==0:
                 birdAgent.feedback(playerPos, upipePos, lpipePos, agent.ALIVE)
                 if birdAgent.jump(playerPos, upipePos, lpipePos):
                     if playery > -2 * IMAGES['player'][0].get_height():
@@ -461,8 +461,8 @@ def checkCrash(player, upperPipes, lowerPipes):
 
         playerRect = pygame.Rect(player['x'], player['y'],
                       player['w'], player['h'])
-        pipeW = IMAGES['pipe'][0].get_width()
-        pipeH = IMAGES['pipe'][0].get_height()
+        pipeW = int(IMAGES['pipe'][0].get_width()*0.6)
+        pipeH = int(IMAGES['pipe'][0].get_height()*0.6)
 
         for uPipe, lPipe in zip(upperPipes, lowerPipes):
             # upper and lower pipe rects

@@ -11,7 +11,7 @@ DEAD = 2
 
 class EpsilonGreedy:
     def __init__(self):
-        self.epsilon = 0.05
+        self.epsilon = 0.01
 
     def takeAction(self, actions):
         if random.random() > self.epsilon:
@@ -64,8 +64,10 @@ class Agent:
             (1.0-self.learnRate)*oldValue + \
             self.learnRate*(reward + self.discountFactor*optimalFuture)
 
-        if time.time() - self.prevTimestamp > 3:
+        if time.time() - self.prevTimestamp > 5:
             print("table size: ", len(self.qtable))
+            with open("qtable.model", "w") as f:
+                f.write(str(self.qtable))
             self.prevTimestamp = time.time()
 #            print(self.prevState, state, oldValue, self.qtable[self.prevState][self.prevAction])
 
@@ -78,8 +80,8 @@ class Agent:
     def getState(self, player, lpipe):
         dx = int((lpipe['x'] - player['x'])/4)
         dy = int((lpipe['y'] - player['y'])/4)
-        playerY = int(player['y']/2)
-        state = (dx, dy)
+        #playerY = int(player['y']/2)
+        state = (dx, dy, int(player['v']/2))
         if state not in self.qtable:
             self.qtable[state] = [0.0, 0.01]
         return state
