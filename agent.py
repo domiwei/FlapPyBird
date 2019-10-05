@@ -39,15 +39,10 @@ class Agent:
 
     # jump returns true if decide to jump this moment
     def jump(self, player, upipe, lpipe):
-        #dx = int(upipe['x'] - player['x'])
-        #dy = int((lpipe['y'] + upipe['y'])/2.0 - player['y'])
         state = self.getState(player, lpipe)
         if state == self.prevState: # do nothing
             return
         action = self.policy.takeAction(self.qtable[state])
- #       print(player, lpipe, upipe, dx, dy)
-        #print(state, self.qtable[state])
-        #time.sleep(0.3)
         self.prevAction = action
         self.prevState = state
         return action == JUMP
@@ -77,12 +72,8 @@ class Agent:
                 with open("qtable.model", "w") as f:
                     f.write(str(self.qtable))
             self.prevTimestamp = time.time()
-#            print(self.prevState, state, oldValue, self.qtable[self.prevState][self.prevAction])
 
-    #    print(self.prevState, state, oldValue, self.qtable[self.prevState])
-    #    time.sleep(0.5)
         if result == DEAD:
-            #print(self.prevState, state, oldValue, self.qtable[self.prevState])
             self.prevState = None
 
     def getState(self, player, lpipe):
